@@ -37,59 +37,6 @@ class Posts extends Controller {
             'imageError' => '',
             'bodyError' => ''
         ];
-
-        if($_SERVER['REQUEST_METHOD'] == 'POST') {
-            var_dump($_POST);
-            $data = [
-                'post_id' => $_POST['id'],
-                'user_id' => $_SESSION['user_id'],
-                'title' => trim($_POST['title']),
-                'slug' => trim($_POST['slug']),
-                'image' => trim($_POST['image']),
-                'body' => trim($_POST['body']),
-                'titleError' => '',
-                'slugError' => '',
-                'imageError' => '',
-                'bodyError' => ''
-            ];
-
-            if (empty($data['title'])) {
-                $data['titleError'] = 'The title of a post cannot be empty';
-            }
-            if (empty($data['slug'])) {
-                $data['slugError'] = 'The slug of a post cannot be empty';
-            }
-            if (empty($data['image'])) {
-                $data['imageError'] = 'The title of a post cannot be empty';
-            }
-            if (empty($data['body'])) {
-                $data['bodyError'] = 'The body of a post cannot be empty';
-            }
-
-//            if($data['title'] == $this->postModel->findPostById($id)->title) {
-//                $data['titleError'] == 'At least change the title!';
-//            }
-//            if($data['slug'] == $this->postModel->findPostById($id)->slug) {
-//                $data['slugError'] == 'At least change the title!';
-//            }
-//            if($data['image'] == $this->postModel->findPostById($id)->image) {
-//                $data['imageError'] == 'At least change the title!';
-//            }
-//            if($data['body'] == $this->postModel->findPostById($id)->body) {
-//                $data['bodyError'] == 'At least change the body!';
-//            }
-
-            if (empty($data['titleError']) && empty($data['slugError']) && empty($data['imageError']) && empty($data['bodyError'])) {
-                if ($this->postModel->updatePost($data)) {
-                    return true;
-                } else {
-                    die("Something went wrong, please try again!");
-                }
-            } else {
-                $this->render('posts/index', $posts);
-            }
-        }
-
         $this->render('posts/index', $posts);
     }
 
@@ -108,6 +55,7 @@ class Posts extends Controller {
                 </button>
                 <div class="show_update_' . $post->post_id . '">
                     <form method="POST" class="update_form" id="' . $post->post_id . '">
+                        <input type="hidden" name="type" value="update">
                         <div class="form-item">
                             <input type="text" name="title' . $post->post_id . '" id="title' . $post->post_id . '"
                                    value="' . $post->title . '"
@@ -251,18 +199,18 @@ class Posts extends Controller {
 
             if (empty($data['titleError']) && empty($data['slugError']) && empty($data['imageError']) && empty($data['bodyError'])) {
                 if ($this->postModel->addPost($data)) {
-                    header("Location: " . URL_ROOT . '/posts');
+                    die('Created');
                 } else {
                     die("Quelque chose c'est mal passé ! Réessayer");
                 }
             } else {
-                $this->render('posts/create', $data);
+                echo 'bug';
             }
         }
-        $this->render('posts/create', $data);
+        die("Fausse création");
     }
 
-  /*  public function update($id) {
+    public function update($id) {
         $post = $this->postModel->findPostById($id);
 
         if(!isLoggedIn()) {
@@ -328,17 +276,15 @@ class Posts extends Controller {
 
             if (empty($data['titleError']) && empty($data['slugError']) && empty($data['imageError']) && empty($data['bodyError'])) {
                 if ($this->postModel->updatePost($data)) {
-                    header("Location: " . URL_ROOT . "/posts");
+                    die("Post updated");
                 } else {
                     die("Something went wrong, please try again!");
                 }
             } else {
-                $this->render('posts/update', $data);
+                die("Bad");
             }
         }
-
-        $this->render('posts/update', $data);
-    }*/
+    }
 
     public function delete($id) {
         $post = $this->postModel->findPostById($id);
