@@ -1,0 +1,18 @@
+# <IfModule mod_rewrite.c>
+#   Options -Multiviews
+#   RewriteEngine On
+  # La directive RewriteBase permet de spécifier le préfixe d'URL à utiliser dans un contexte de répertoire (htaccess) pour les directives RewriteRule qui réécrivent vers un chemin relatif.
+#   RewriteBase /blogcorrection/public
+  # La directive RewriteCond permet de définir une condition d'exécution d'une règle. Une ou plusieurs conditions RewriteCond peuvent précéder une directive RewriteRule. La règle de réécriture correspondante n'est ainsi exécutée que si ces conditions sont satisfaites, et si l'URI correspond au modèle spécifié dans la règle.
+#   RewriteCond %{REQUEST_FILENAME} !-d
+#   RewriteCond %{REQUEST_FILENAME} !-f
+#   RewriteRule  ^(.+)$ index.php?url=$1 [QSA,L]
+# </IfModule>
+<IfModule mod_rewrite.c>
+  Options -Multiviews
+  RewriteEngine On
+  RewriteBase /blog_ajax/public
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule  ^(.+)$ index.php?url=$1 [QSA,L]
+</IfModule>
