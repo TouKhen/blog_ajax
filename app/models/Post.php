@@ -99,4 +99,25 @@ class Post {
             return false;
         }
     }
+
+    public function getReplies($id)
+    {
+        $this->db->query('SELECT * FROM comment_replies JOIN (`comments`, `posts`) USING (`comment_id`) WHERE posts.post_id = ' . $id . ' ORDER BY comment_replies.created_at ASC');
+        return $this->db->fetchAll();
+    }
+
+    public function postReply($data)
+    {
+        $this->db->query('INSERT INTO `comment_replies` (`reply_id`, `comment_id`, `post_id`, `user_id`, `body`) VALUES (NULL, :comment_id, :post_id, :user_id, :body)');
+        $this->db->bind(':comment_id', $data['comment_id']);
+        $this->db->bind(':post_id', $data['post_id']);
+        $this->db->bind(':user_id', $data['user_id']);
+        $this->db->bind(':body', $data['body']);
+
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

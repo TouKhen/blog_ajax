@@ -62,6 +62,7 @@
                         success : (res)=>{
                             console.log({id:id, title:title, slug:slug, image:image, body:body});
                             console.log("success : " + res);
+                            verif = true;
                             $('.show_update_' + id).css('display', 'none');
                             $('#' + id).children('.post_title').text(title);
                             $('#' + id).children('.post_body').text(body);
@@ -92,6 +93,27 @@
                         }
                     });
                 })
+
+                // reply comment
+                $('.send_reply').on('click', function(event){
+                    event.preventDefault();
+                    let comment_id = $(this).data('id');
+                    let body = $("#reply_body" + comment_id).val();
+                    let post_id = $("#post_id").val();
+                    let reply_ctn = $('#reply_container' + comment_id);
+
+                    $.ajax({
+                        url : "<?= URL_ROOT ?>/posts/reply/" + comment_id,
+                        data : {comment_id:comment_id, post_id:post_id, body:body},
+                        type : "POST",
+                        async : true,
+                        success : (res)=>{
+                            console.log({comment_id:comment_id, post_id:post_id, body:body});
+                            console.log(res);
+                            reply_ctn.append("<div class='reply'><h4><?= $_SESSION['username'] ?></h4><p>" + body + "</p></div>");
+                        }
+                    });
+                });
             }
         });
     });

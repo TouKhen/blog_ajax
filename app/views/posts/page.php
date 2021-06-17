@@ -25,6 +25,18 @@ require APP_ROOT . '/views/inc/head.php';
             <div>
                 <h4><?= $comment->username ?></h4>
                 <p><?= $comment->body ?></p>
+
+                <div id="reply_container<?= $comment->comment_id ?>">
+                    <form method="post" id="reply_comment<?= $comment->comment_id ?>">
+                        <input type="hidden" id="post_id" name="post_id" value="<?= $data['post']->post_id ?>">
+                        <label for="body">Reply here :</label>
+                        <textarea name="body" id="reply_body<?= $comment->comment_id ?>"" cols="30" rows="10"></textarea>
+
+                        <button class="send_reply" type="submit" name="submit" data-id="<?= $comment->comment_id ?>">Reply</button>
+                    </form>
+                    <?php foreach($data['replies']) ?>
+                    <?php endforeach;?>
+                </div>
             </div>
         <?php endforeach;}?>
     </div>

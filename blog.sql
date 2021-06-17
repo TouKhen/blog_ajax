@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 17 juin 2021 à 09:20
+-- Généré le : jeu. 17 juin 2021 à 12:11
 -- Version du serveur :  10.4.18-MariaDB
 -- Version de PHP : 8.0.3
 
@@ -53,6 +53,30 @@ INSERT INTO `comments` (`comment_id`, `user_id`, `post_id`, `body`, `created_at`
 (13, 4, 35, 'htht', '2021-06-16 13:38:27'),
 (14, 4, 35, 'oui', '2021-06-16 13:39:04'),
 (15, 4, 35, 'hhyy', '2021-06-17 07:16:16');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `comment_replies`
+--
+
+CREATE TABLE `comment_replies` (
+  `reply_id` int(11) NOT NULL,
+  `comment_id` int(11) NOT NULL,
+  `post_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `body` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `comment_replies`
+--
+
+INSERT INTO `comment_replies` (`reply_id`, `comment_id`, `post_id`, `user_id`, `body`, `created_at`) VALUES
+(5, 2, 36, 3, 'ilomommp', '2021-06-17 10:00:15'),
+(7, 13, 35, 4, 'egege', '2021-06-17 10:07:51'),
+(8, 13, 35, 4, 'oui', '2021-06-17 10:08:11');
 
 -- --------------------------------------------------------
 
@@ -126,6 +150,15 @@ ALTER TABLE `comments`
   ADD KEY `post_id` (`post_id`);
 
 --
+-- Index pour la table `comment_replies`
+--
+ALTER TABLE `comment_replies`
+  ADD PRIMARY KEY (`reply_id`),
+  ADD KEY `comment_id` (`comment_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `post_id` (`post_id`);
+
+--
 -- Index pour la table `posts`
 --
 ALTER TABLE `posts`
@@ -150,6 +183,12 @@ ALTER TABLE `comments`
   MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
+-- AUTO_INCREMENT pour la table `comment_replies`
+--
+ALTER TABLE `comment_replies`
+  MODIFY `reply_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT pour la table `posts`
 --
 ALTER TABLE `posts`
@@ -171,6 +210,14 @@ ALTER TABLE `users`
 ALTER TABLE `comments`
   ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`post_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `comment_replies`
+--
+ALTER TABLE `comment_replies`
+  ADD CONSTRAINT `comment_replies_ibfk_1` FOREIGN KEY (`comment_id`) REFERENCES `comments` (`comment_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `comment_replies_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `comment_replies_ibfk_3` FOREIGN KEY (`post_id`) REFERENCES `posts` (`post_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `posts`

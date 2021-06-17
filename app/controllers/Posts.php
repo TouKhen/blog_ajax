@@ -96,8 +96,8 @@ class Posts extends Controller {
                            class="btn red delete_post">
                 </form>
                 <script>
-                    let verif_' . $post->post_id . ' = true;
                     $(function () {
+                        let verif_' . $post->post_id . ' = true;
                         $(".show_update_' . $post->post_id . '").css("display", "none");
                         $(".update_' . $post->post_id . '").on("click", () => {
                             if (verif_' . $post->post_id . ') {
@@ -318,12 +318,14 @@ class Posts extends Controller {
     {
         $post = $this->postModel->findPostById($id);
         $comments = $this->postModel->getComments($id);
+        $replies = $this->postModel->getReplies($id);
 
         $data = [
             'post_id' => $id,
             'user_id' => '',
             'post' => $post,
             'comments' => $comments,
+            'comment_reply' => $replies,
             'body' => ''
         ];
 
@@ -335,6 +337,7 @@ class Posts extends Controller {
                 'user_id' => $_SESSION['user_id'],
                 'post' => $post,
                 'comments' => $comments,
+                'comment_reply' => $replies,
                 'body' => $_POST['body']
             ];
             var_dump($data);
@@ -347,5 +350,32 @@ class Posts extends Controller {
         }
 
         $this->render('posts/page', $data);
+    }
+
+    public function reply($id)
+    {
+        $data = [
+            'comment_id' => $id,
+            'user_id' => '',
+            'post_id' => '',
+            'body' => ''
+        ];
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $data = [
+                'comment_id' => $id,
+                'user_id' => $_SESSION['user_id'],
+                'post_id' => $_POST['post_id'],
+                'body' => $_POST['body']
+            ];
+
+            if($this->postModel->postReply($data)) {
+                die('Posted');
+            } else {
+                die('Something went wrong!');
+            }
+        }
     }
 }
