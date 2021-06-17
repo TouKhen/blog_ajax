@@ -71,6 +71,27 @@
                         }
                     });
                 })
+
+                // post comment
+                $('#send_comment').on('click', function (event){
+                    event.preventDefault();
+                    let post_id = $(this).data('id');
+                    let body = $("#body").val();
+                    let comment_ctn = $('#comment_container');
+
+                    console.log(post_id);
+
+                    $.ajax({
+                        url : "<?= URL_ROOT ?>/posts/page/" + post_id,
+                        data : {post_id:post_id, body:body},
+                        type : "POST",
+                        async : true,
+                        success : (res)=>{
+                            console.log(res);
+                            comment_ctn.append("<div><h4><?= $_SESSION['username'] ?></h4><p>" + body + "</p></div>");
+                        }
+                    });
+                })
             }
         });
     });

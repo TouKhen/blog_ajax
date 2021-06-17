@@ -79,4 +79,24 @@ class Post {
             return false;
         }
     }
+
+    public function getComments($id)
+    {
+        $this->db->query('SELECT * FROM comments JOIN (`users`) USING (`user_id`) WHERE users.user_id = comments.user_id AND post_id = ' . $id . ' ORDER BY comments.created_at ASC');
+        return $this->db->fetchAll();
+    }
+
+    public function postComment($data)
+    {
+        $this->db->query('INSERT INTO `comments` (`comment_id`, `user_id`, `post_id`, `body`, `created_at`) VALUES (NULL, :user_id, :post_id, :body, current_timestamp())');
+        $this->db->bind(':user_id', $data['user_id']);
+        $this->db->bind(':post_id', $data['post_id']);
+        $this->db->bind(':body', $data['body']);
+
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

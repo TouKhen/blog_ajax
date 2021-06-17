@@ -111,7 +111,7 @@ class Posts extends Controller {
                     });
                 </script>
                         <h2 class="post_title">
-                            ' . $post->title . '
+                            <a href="'. URL_ROOT . '/posts/page/' . $post->post_id . '">' . $post->title . '</a>
                         </h2>
 
                         <h3>
@@ -128,7 +128,7 @@ class Posts extends Controller {
             $postsArray .= '
                                 <div class="container-item" id="' . $post->post_id . '">
                                     <h2 class="post_title">
-                                        ' . $post->title . '
+                                        <a href="'. URL_ROOT . '/posts/page/' . $post->post_id . '">' . $post->title . '</a>
                                     </h2>
 
                                     <h3>
@@ -312,5 +312,40 @@ class Posts extends Controller {
                 die('Something went wrong!');
             }
         }
+    }
+
+    public function page($id)
+    {
+        $post = $this->postModel->findPostById($id);
+        $comments = $this->postModel->getComments($id);
+
+        $data = [
+            'post_id' => $id,
+            'user_id' => '',
+            'post' => $post,
+            'comments' => $comments,
+            'body' => ''
+        ];
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $data = [
+                'post_id' => $id,
+                'user_id' => $_SESSION['user_id'],
+                'post' => $post,
+                'comments' => $comments,
+                'body' => $_POST['body']
+            ];
+            var_dump($data);
+
+            if($this->postModel->postComment($data)) {
+                die('Posted');
+            } else {
+                die('Something went wrong!');
+            }
+        }
+
+        $this->render('posts/page', $data);
     }
 }
