@@ -26,6 +26,18 @@ class Post {
         return $this->db->fetchAll();
     }
 
+    public function getLastPostId()
+    {
+        $this->db->query('SELECT MAX(post_id) AS `post_id` FROM posts');
+        return $this->db->fetch();
+    }
+
+    public function getLastCreatedPost()
+    {
+        $this->db->query('SELECT MAX(`created_at`) AS `created_at` FROM `posts`');
+        return $this->db->fetch();
+    }
+
     public function addPost($data)
     {
         $this->db->query('INSERT INTO posts (user_id, title, slug, image, body, published) VALUES (:user_id, :title, :slug, :image, :body, :published)');
@@ -102,17 +114,17 @@ class Post {
 
     public function getReplies($id)
     {
-        $this->db->query('SELECT * FROM comment_replies JOIN (`comments`, `posts`) USING (`comment_id`) WHERE posts.post_id = ' . $id . ' ORDER BY comment_replies.created_at ASC');
+        $this->db->query('SELECT * FROM comment_replies JOIN (`posts`) USING (`post_id`) WHERE posts.post_id = ' . $id . ' ORDER BY comment_replies.created_at ASC');
         return $this->db->fetchAll();
     }
 
     public function postReply($data)
     {
-        $this->db->query('INSERT INTO `comment_replies` (`reply_id`, `comment_id`, `post_id`, `user_id`, `body`) VALUES (NULL, :comment_id, :post_id, :user_id, :body)');
+        $this->db->query('INSERT INTO `comment_replies` (`reply_id`, `comment_id`, `post_id`, `user_id`, `rep_body`) VALUES (NULL, :comment_id, :post_id, :user_id, :rep_body)');
         $this->db->bind(':comment_id', $data['comment_id']);
         $this->db->bind(':post_id', $data['post_id']);
         $this->db->bind(':user_id', $data['user_id']);
-        $this->db->bind(':body', $data['body']);
+        $this->db->bind(':rep_body', $data['rep_body']);
 
         if ($this->db->execute()) {
             return true;

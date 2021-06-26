@@ -7,27 +7,32 @@
             success : (data)=>{
                 let postCont = $('#post_container');
                 postCont.html(data);
+                console.log(data);
 
                 // delete post
-                $('.delete_post').on('click', ()=>{
+                $('.delete_post').on('click', function (event){
                     let id  =   $(this).data('id');
+                    let post = $('#' + id);
+                    event.preventDefault();
                     $.ajax({
-                        url     :   "<?= URL_ROOT ?>/posts/delete",
+                        url     :   "<?= URL_ROOT ?>/posts/delete/" + id,
                         data    :   {id:id},
                         type    :   "POST",
                         async   :   true,
                         success :   (res)=>{
+                            console.log(res);
+                            post.html('Post removed');
                         }
                     });
                 })
 
                 $('#form_create').on('submit', (event)=>{
                     event.preventDefault();
+                    let post_ctn = $('#post_container');
                     let title = $('#create_title').val();
                     let slug = $('#create_slug').val();
                     let image = $('#create_image').val();
                     let body = $('#create_body').val();
-                    console.log({title:title, slug:slug, image:image, body:body});
 
                     $.ajax({
                         url : "<?= URL_ROOT ?>/posts/create",
@@ -35,8 +40,7 @@
                         type : "POST",
                         async : true,
                         success : (res)=>{
-                            console.log({title:title, slug:slug, image:image, body:body});
-                            console.log("success : " + res);
+                            post_ctn.append(res);
                         },
                         error : (res)=>{
                             console.log("error : " + res);
@@ -98,19 +102,19 @@
                 $('.send_reply').on('click', function(event){
                     event.preventDefault();
                     let comment_id = $(this).data('id');
-                    let body = $("#reply_body" + comment_id).val();
+                    let rep_body = $("#rep_body" + comment_id).val();
                     let post_id = $("#post_id").val();
                     let reply_ctn = $('#reply_container' + comment_id);
 
                     $.ajax({
                         url : "<?= URL_ROOT ?>/posts/reply/" + comment_id,
-                        data : {comment_id:comment_id, post_id:post_id, body:body},
+                        data : {comment_id:comment_id, post_id:post_id, rep_body:rep_body},
                         type : "POST",
                         async : true,
                         success : (res)=>{
-                            console.log({comment_id:comment_id, post_id:post_id, body:body});
+                            console.log({comment_id:comment_id, post_id:post_id, rep_body:rep_body});
                             console.log(res);
-                            reply_ctn.append("<div class='reply'><h4><?= $_SESSION['username'] ?></h4><p>" + body + "</p></div>");
+                            reply_ctn.append("<div class='reply'><h4><?= $_SESSION['username'] ?></h4><p>" + rep_body + "</p></div>");
                         }
                     });
                 });

@@ -24,19 +24,10 @@ class Posts extends Controller {
     public function index() {
         $posts = $this->postModel->findAllPosts();
 
-        $postsArray = '';
         $data = [
-            'posts' => $posts,
-            'post' => '',
-            'title' => '',
-            'slug' => '',
-            'image' => '',
-            'body' => '',
-            'titleError' => '',
-            'slugError' => '',
-            'imageError' => '',
-            'bodyError' => ''
+            'posts' => $posts
         ];
+
         $this->render('posts/index', $posts);
     }
 
@@ -93,7 +84,7 @@ class Posts extends Controller {
                 <form action="' . URL_ROOT . '/posts/delete/' . $post->post_id . '"
                       method="POST">
                     <input type="submit" name="delete" value="Delete"
-                           class="btn red delete_post">
+                           class="btn red delete_post" data-id="' . $post->post_id . '">
                 </form>
                 <script>
                     $(function () {
@@ -124,7 +115,7 @@ class Posts extends Controller {
                     </div>
                 </div>
                 ';
-                } else {
+                } else if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] !== $post->user_id) {
             $postsArray .= '
                                 <div class="container-item" id="' . $post->post_id . '">
                                     <h2 class="post_title">
@@ -141,11 +132,9 @@ class Posts extends Controller {
                                 </div>
                             </div>
                                                     ';
-}
+            }
         }
         echo $postsArray;
-
-        $this->render('posts/posts', $postsArray);
     }
 
     public function create()
@@ -199,7 +188,99 @@ class Posts extends Controller {
 
             if (empty($data['titleError']) && empty($data['slugError']) && empty($data['imageError']) && empty($data['bodyError'])) {
                 if ($this->postModel->addPost($data)) {
-                    die('Created');
+                    $post_id = $this->postModel->getLastPostId();
+                    $created_at = $this->postModel->getLastCreatedPost();
+                    $data = [
+                        'post_id' => $post_id->post_id,
+                        'created_at' => $created_at->created_at,
+                        'user_id' => $_SESSION['user_id'],
+                        'title' => trim($_POST['title']),
+                        'slug' => trim($_POST['slug']),
+                        'image' => $_POST['image'],
+                        'body' => trim($_POST['body']),
+                        'published' => 0,
+                        'titleError' => '',
+                        'slugError' => '',
+                        'imageError' => '',
+                        'bodyError' => '',
+                    ];
+
+                    echo '
+                        <div class="container-item" id="' . $data['post_id'] . '">
+                <button class="btn orange update_'.$data['post_id'] .'" href="' . URL_ROOT . '/posts/update/' . $data['post_id'] . '">
+                    Update
+                </button>
+                <div class="show_update_' . $data['post_id'] . '">
+                    <form method="POST" class="update_form" id="' . $data['post_id'] . '">
+                        <input type="hidden" name="type" value="update">
+                        <div class="form-item">
+                            <input type="text" name="title' . $data['post_id'] . '" id="title' . $data['post_id'] . '"
+                                   value="' . $data['title'] . '"
+                                   data-target="' . $data['title'] . '">
+                            <span class="invalidFeedback"></span>
+                        </div>
+        
+                        <div class="form-item">
+                            <input type="text" name="slug' . $data['post_id'] . '" id="slug' . $data['post_id'] . '"
+                                   value="' . $data['slug'] . '"
+                                   data-target="' . $data['slug'] . '">
+                            <span class="invalidFeedback"></span>
+                        </div>
+        
+                        <div class="form-item">
+                            <input type="text" name="image' . $data['post_id'] . '" id="image' . $data['post_id'] . '"
+                                   value="' . $data['image'] . '"
+                                   data-target="' . $data['image'] . '">
+                            <span class="invalidFeedback"></span>
+                        </div>
+        
+                        <div class="form-item">
+                                                    <textarea name="body' . $data['post_id'] . '" id="body' . $data['post_id'] . '"
+                                                              placeholder="Enter your post..."
+                                                              data-target="' . $data['body'] . '">' . $data['body'] . '</textarea>
+                            <span class="invalidFeedback"></span>
+                        </div>
+        
+                        <button class="btn green update_post" name="submit" data-id="' . $data['post_id'] . '"
+                                type="submit">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+                <form action="' . URL_ROOT . '/posts/delete/' . $data['post_id'] . '"
+                      method="POST">
+                    <input type="submit" name="delete" value="Delete"
+                           class="btn red delete_post" data-id="' . $data['post_id'] . '">
+                </form>
+                <script>
+                    $(function () {
+                        let verif_' . $data['post_id'] . ' = true;
+                        $(".show_update_' . $data['post_id'] . '").css("display", "none");
+                        $(".update_' . $data['post_id'] . '").on("click", () => {
+                            if (verif_' . $data['post_id'] . ') {
+                                $(".show_update_' . $data['post_id'] .'").css("display", "block");
+                                verif_' . $data['post_id'] . ' = false;
+                            } else if (!verif_' . $data['post_id'] . ') {
+                                $(".show_update_' . $data['post_id'] . '").css("display", "none");
+                                verif_' . $data['post_id'] . ' = true;
+                            }
+                        })
+                    });
+                </script>
+                        <h2 class="post_title">
+                            <a href="'. URL_ROOT . '/posts/page/' . $data['post_id'] . '">' . $data['title'] . '</a>
+                        </h2>
+
+                        <h3>
+                            Created on: ' . date('F j h:m', strtotime($data['created_at'])) . '
+                        </h3>
+
+                        <p class="post_body">
+                            ' . $data['body'] . '
+                        </p>
+                    </div>
+                </div>
+                        ';
                 } else {
                     die("Quelque chose c'est mal passé ! Réessayer");
                 }
@@ -296,18 +377,14 @@ class Posts extends Controller {
         }
 
         $data = [
-            'post' => $post,
-            'title' => '',
-            'body' => '',
-            'titleError' => '',
-            'bodyError' => ''
+            'post' => $post
         ];
 
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
             if($this->postModel->deletePost($id)) {
-                header("Location: " . URL_ROOT . "/posts");
+                die('It worked');
             } else {
                 die('Something went wrong!');
             }
@@ -325,7 +402,7 @@ class Posts extends Controller {
             'user_id' => '',
             'post' => $post,
             'comments' => $comments,
-            'comment_reply' => $replies,
+            'comment_replies' => $replies,
             'body' => ''
         ];
 
@@ -363,12 +440,13 @@ class Posts extends Controller {
 
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            var_dump($_POST);
 
             $data = [
                 'comment_id' => $id,
                 'user_id' => $_SESSION['user_id'],
                 'post_id' => $_POST['post_id'],
-                'body' => $_POST['body']
+                'rep_body' => $_POST['rep_body']
             ];
 
             if($this->postModel->postReply($data)) {

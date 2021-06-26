@@ -33,10 +33,25 @@
             <button id="create_post" type="submit" value="submit">Create</button>
         </form>
     </div>
-    <p>List of articles below \/</p>
     <?php endif; ?>
+    <p>List of articles below \/</p>
     <div id="post_container">
 <!--   All posts     -->
+        <?php foreach ($data as $post): ?>
+            <div class="container-item" id="<?= $post->post_id ?>">
+                <h2 class="post_title">
+                    <a href="<?= URL_ROOT . '/posts/page/' . $post->post_id ?>"><?= $post->title ?></a>
+                </h2>
+
+                <h3>
+                    Created on: <?= date('F j h:m', strtotime($post->created_at)) ?>
+                </h3>
+
+                <p class="post_body">
+                    <?= $post->body ?>
+                </p>
+            </div>
+        <?php endforeach; ?>
     </div>
 </div>
 
